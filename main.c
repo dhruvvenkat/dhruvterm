@@ -4,10 +4,10 @@
 #include <stdbool.h> // archaic, need to remove this reference
 
 int main() {
-	clearScreen();
 	char promptChar = '>';
 	char *exitCommand = "exit";
 
+	initialize(); // clear screen + print title ascii art
 	while (true) {
 		printf("%c ", promptChar);
 
