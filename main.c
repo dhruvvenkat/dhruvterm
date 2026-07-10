@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h> // archaic, need to remove this reference
+#include <unistd.h>
+#include <sys/wait.h>
 
 int main() {
 	char promptChar = '>';
@@ -18,7 +20,20 @@ int main() {
 			return EXIT_SUCCESS;
 		}
 
-		printf("command was: %s\n\n", command);
+		int childTerm = fork();
+
+		if (childTerm == 0) {
+			// child path - exec() command
+			// basically we need to "tokenize" the incoming command by stripping out the spaces and passing that to execvp
+//			execvp(
+		
+		} else {
+			// parent path - just go back to the thingy
+			int status;
+			pid_t child_pid = wait(&status); // freeze until child calls exit()
+			//continue;
+		}
+		
 	}
 
 	return 0;
