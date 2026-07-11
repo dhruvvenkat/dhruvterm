@@ -1,15 +1,26 @@
 #include "environment.c"
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h> // archaic, need to remove this reference
 #include <unistd.h>
 #include <sys/wait.h>
+#include <signal.h>
 
 #define MAX_TOKENS 20
+
+void signalHandler(int sig) {
+	printf("interrupt handled: %d", sig);
+
+	exit(sig);
+}
 
 int main() {
 	char promptChar = '>';
 	char *exitCommand = "exit";
+
+	signal(SIGINT, signalHandler);
+//	signal(SIGCHLD, signalHandler);
 
 	initialize(); // clear screen + print title ascii art
 	while (true) {
@@ -19,6 +30,9 @@ int main() {
 		while (fgets(command, sizeof(command), stdin) == NULL) {
 			break;
 		}
+
+		command[strcspn(command, "\n")] = '\0'; // replace the newline character with a null terminator so that we can compare against hard-coded keywords (e.g. exit)
+//		printf("command: %s", command); 
 
 		if (strcmp(command, exitCommand) == 0) {
 			return EXIT_SUCCESS;
@@ -37,10 +51,9 @@ int main() {
 
 		tokens[numTokens] = NULL; // set the last value to NULL for execvp
 		
-		for (int i = 0; tokens[i] != NULL; i++) {
-			printf("token %d: %s\n", i, tokens[i]);
-		}
-
+//		for (int i = 0; tokens[i] != NULL; i++) {
+//			printf("token %d: %s\n", i, tokens[i]);
+//		}
 
 		pid_t childCmd = fork();
 
