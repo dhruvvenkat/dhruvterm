@@ -15,8 +15,10 @@ int main() {
 	while (true) {
 		printf("%c ", promptChar);
 
-		char command[10];
-		scanf("%s", command);
+		char command[1024]; // give 1mb of space for a command (should be enough)
+		while (fgets(command, sizeof(command), stdin) == NULL) {
+			break;
+		}
 
 		if (strcmp(command, exitCommand) == 0) {
 			return EXIT_SUCCESS;
@@ -34,6 +36,10 @@ int main() {
 		}
 
 		tokens[numTokens] = NULL; // set the last value to NULL for execvp
+		
+		for (int i = 0; tokens[i] != NULL; i++) {
+			printf("token %d: %s\n", i, tokens[i]);
+		}
 
 		pid_t childCmd = fork();
 
@@ -41,14 +47,9 @@ int main() {
 			fprintf(stderr, "fork failed\n");
 			exit(1);
 		} else if (childCmd == 0) {
-			// child path - exec() command
-			// basically we need to "tokenize" the incoming command by stripping out the spaces and passing that to execvp
-			
-			
 			execvp(tokens[0], tokens);
 			perror("execvp");
-
-			exit(1);
+			_exit(127); // note: linux child processes should always use _exit() instead of C exit()
 		} else {
 			// parent path - just go back to the top
 			pid_t child_pid = wait(NULL); // freeze until child calls exit()
