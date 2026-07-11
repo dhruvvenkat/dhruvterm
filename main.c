@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
+#define MAX_TOKENS 20
+
 int main() {
 	char promptChar = '>';
 	char *exitCommand = "exit";
@@ -20,17 +22,35 @@ int main() {
 			return EXIT_SUCCESS;
 		}
 
-		int childTerm = fork();
+		pid_t childCmd = fork();
 
-		if (childTerm == 0) {
+		if (childCmd < 0) {
+			fprintf(stderr, "fork failed\n");
+			exit(1);
+		} else if (childCmd == 0) {
 			// child path - exec() command
 			// basically we need to "tokenize" the incoming command by stripping out the spaces and passing that to execvp
-//			execvp(
-		
+			
+			char *token = strtok(command, " ");
+			char *tokens[MAX_TOKENS];
+			int numTokens = 0;
+
+			while (token != NULL && numTokens < MAX_TOKENS - 1) {
+				tokens[numTokens] = token;
+				numTokens++;
+
+				token = strtok(NULL, " \t\n");
+			}
+
+			tokens[numTokens] = NULL; // set the last value to NULL for execvp
+			
+			execvp(tokens[0], tokens);
+			perror("execvp");
+
+			exit(1);
 		} else {
-			// parent path - just go back to the thingy
-			int status;
-			pid_t child_pid = wait(&status); // freeze until child calls exit()
+			// parent path - just go back to the top
+			pid_t child_pid = wait(NULL); // freeze until child calls exit()
 			//continue;
 		}
 		
