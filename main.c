@@ -22,6 +22,19 @@ int main() {
 			return EXIT_SUCCESS;
 		}
 
+		char *token = strtok(command, " ");
+		char *tokens[MAX_TOKENS];
+		int numTokens = 0;
+
+		while (token != NULL && numTokens < MAX_TOKENS - 1) {
+			tokens[numTokens] = token;
+			numTokens++;
+
+			token = strtok(NULL, " \t\n");
+		}
+
+		tokens[numTokens] = NULL; // set the last value to NULL for execvp
+
 		pid_t childCmd = fork();
 
 		if (childCmd < 0) {
@@ -31,18 +44,6 @@ int main() {
 			// child path - exec() command
 			// basically we need to "tokenize" the incoming command by stripping out the spaces and passing that to execvp
 			
-			char *token = strtok(command, " ");
-			char *tokens[MAX_TOKENS];
-			int numTokens = 0;
-
-			while (token != NULL && numTokens < MAX_TOKENS - 1) {
-				tokens[numTokens] = token;
-				numTokens++;
-
-				token = strtok(NULL, " \t\n");
-			}
-
-			tokens[numTokens] = NULL; // set the last value to NULL for execvp
 			
 			execvp(tokens[0], tokens);
 			perror("execvp");
