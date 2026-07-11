@@ -24,7 +24,7 @@ int main() {
 			return EXIT_SUCCESS;
 		}
 
-		char *token = strtok(command, " ");
+		char *token = strtok(command, " \t\n");
 		char *tokens[MAX_TOKENS];
 		int numTokens = 0;
 
@@ -41,18 +41,20 @@ int main() {
 			printf("token %d: %s\n", i, tokens[i]);
 		}
 
+
 		pid_t childCmd = fork();
 
 		if (childCmd < 0) {
 			fprintf(stderr, "fork failed\n");
-			exit(1);
+			_exit(1);
 		} else if (childCmd == 0) {
 			execvp(tokens[0], tokens);
-			perror("execvp");
+			perror("execvp"); // only return from execvp if it failed
 			_exit(127); // note: linux child processes should always use _exit() instead of C exit()
 		} else {
 			// parent path - just go back to the top
-			pid_t child_pid = wait(NULL); // freeze until child calls exit()
+			int status;
+			waitpid(childCmd, &status, 0); // freeze until child calls exit()
 			//continue;
 		}
 		
