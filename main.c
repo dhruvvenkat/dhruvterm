@@ -18,11 +18,9 @@ void signalHandler(int sig) {
 }
 
 int main() {
-	char promptChar = '>';
 	char *exitCommand = "exit";
 
 	signal(SIGINT, signalHandler);
-//	signal(SIGCHLD, signalHandler);
 
 	initialize(); // clear screen + print title ascii art
 	while (true) {
@@ -36,14 +34,7 @@ int main() {
 		}
 
 		command[strcspn(command, "\n")] = '\0'; // replace the newline character with a null terminator so that we can compare against hard-coded keywords (e.g. exit)
-//		printf("command: %s", command); 
 
-//		if (strcmp(command, "^L") == 0) {
-//			printf("\033[2J\033[H");
-//			fflush(stdout);
-//			continue;
-//		}
-	
 		if (strcmp(command, exitCommand) == 0) {
 			return EXIT_SUCCESS;
 		}
@@ -64,6 +55,17 @@ int main() {
 //		for (int i = 0; tokens[i] != NULL; i++) {
 //			printf("token %d: %s\n", i, tokens[i]);
 //		}
+		
+		// handling cd separately
+		if (tokens[0] != NULL && strcmp(tokens[0], "cd") == 0) {
+			if (tokens[1] == NULL) {
+				fprintf(stderr, "cd: missing arguments\n");
+			} else if (chdir(tokens[1]) != 0)  {
+				perror("cd");
+			}
+
+			continue;
+		}
 
 		pid_t childCmd = fork();
 
