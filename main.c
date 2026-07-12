@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include <readline/history.h>
+#include <readline/readline.h>
 
 #define MAX_TOKENS 20
 
@@ -24,16 +26,24 @@ int main() {
 
 	initialize(); // clear screen + print title ascii art
 	while (true) {
-		printf("%c ", promptChar);
+		char *command = readline("> ");
+		if (command == NULL) {
+			continue;
+		}
 
-		char command[1024]; // give 1mb of space for a command (should be enough)
-		while (fgets(command, sizeof(command), stdin) == NULL) {
-			break;
+		if (command[0] != '\0') {
+			add_history(command);
 		}
 
 		command[strcspn(command, "\n")] = '\0'; // replace the newline character with a null terminator so that we can compare against hard-coded keywords (e.g. exit)
 //		printf("command: %s", command); 
 
+//		if (strcmp(command, "^L") == 0) {
+//			printf("\033[2J\033[H");
+//			fflush(stdout);
+//			continue;
+//		}
+	
 		if (strcmp(command, exitCommand) == 0) {
 			return EXIT_SUCCESS;
 		}

@@ -1,0 +1,5 @@
+- text highlighting for commands, filenames, etc.
+- tab-autocomplete for filenames/folders
+- termios support(?)
+- skip string tokenization
+

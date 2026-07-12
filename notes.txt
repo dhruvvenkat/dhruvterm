@@ -1,0 +1,5 @@
+ - scanf only scans until the first whitespace, fgets scans the entire inputted line
+ - ^L (clear screen) is not handled by a Linux signal, it corresponds to ASCII-12 ('\f') - form feed
+
+ - readline can capture whatever shortcuts are handled on the machine (stty -a)
+ - termios is used to enable more control over shortcuts/text handling (man termios)
