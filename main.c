@@ -1,4 +1,5 @@
 #include "environment.c"
+#include "tokenizer.c"
 
 #include <string.h>
 #include <stdlib.h>
@@ -9,8 +10,6 @@
 #include <readline/history.h>
 #include <readline/readline.h>
 
-#define MAX_TOKENS 20
-
 void signalHandler(int sig) {
 	printf("interrupt handled: %d", sig);
 
@@ -18,19 +17,18 @@ void signalHandler(int sig) {
 }
 
 int main() {
+	char command[1024];
 	char *exitCommand = "exit";
 
 	signal(SIGINT, signalHandler);
 
 	initialize(); // clear screen + print title ascii art
 	while (true) {
-		char *command = readline("> ");
+		printf("> ");
+
+		fgets(command, sizeof(command), stdin);
 		if (command == NULL) {
 			continue;
-		}
-
-		if (command[0] != '\0') {
-			add_history(command);
 		}
 
 		command[strcspn(command, "\n")] = '\0'; // replace the newline character with a null terminator so that we can compare against hard-coded keywords (e.g. exit)
@@ -39,19 +37,14 @@ int main() {
 			return EXIT_SUCCESS;
 		}
 
-		char *token = strtok(command, " \t\n");
 		char *tokens[MAX_TOKENS];
-		int numTokens = 0;
-
-		while (token != NULL && numTokens < MAX_TOKENS - 1) {
-			tokens[numTokens] = token;
-			numTokens++;
-
-			token = strtok(NULL, " \t\n");
+		
+		int numTokens = tokenize(command, tokens, MAX_TOKENS);
+		if (numTokens < 0) {
+			fprintf(stderr, "tokenization failed");
+			return -1;
 		}
 
-		tokens[numTokens] = NULL; // set the last value to NULL for execvp
-		
 //		for (int i = 0; tokens[i] != NULL; i++) {
 //			printf("token %d: %s\n", i, tokens[i]);
 //		}
