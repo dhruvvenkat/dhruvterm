@@ -17,18 +17,20 @@ void signalHandler(int sig) {
 }
 
 int main() {
-	char command[1024];
 	char *exitCommand = "exit";
 
 	signal(SIGINT, signalHandler);
 
 	initialize(); // clear screen + print title ascii art
 	while (true) {
-		printf("> ");
+		char *command = readline("> ");
 
-		fgets(command, sizeof(command), stdin);
 		if (command == NULL) {
 			continue;
+		}
+
+		if (command[0] != '\0') {
+			add_history(command);
 		}
 
 		command[strcspn(command, "\n")] = '\0'; // replace the newline character with a null terminator so that we can compare against hard-coded keywords (e.g. exit)
@@ -44,10 +46,6 @@ int main() {
 			fprintf(stderr, "tokenization failed");
 			return -1;
 		}
-
-//		for (int i = 0; tokens[i] != NULL; i++) {
-//			printf("token %d: %s\n", i, tokens[i]);
-//		}
 		
 		// handling cd separately
 		if (tokens[0] != NULL && strcmp(tokens[0], "cd") == 0) {
@@ -76,8 +74,8 @@ int main() {
 			//continue;
 		}
 		
+		free(command);
 	}
-
 	return 0;
 
 }
