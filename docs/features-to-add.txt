@@ -1,5 +1,13 @@
 - text highlighting for commands, filenames, etc.
-- tab-autocomplete for filenames/folders
 - termios support(?)
-- skip string tokenization
+
+- pipes (|)
+- redirection (>)
+- more builtins like
+  --> export
+  --> unset
+  --> env
+  --> history
+
+- up-arrow for history
 
