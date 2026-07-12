@@ -31,6 +31,8 @@ int main() {
 
 		if (command[0] != '\0') {
 			add_history(command);
+		} else {
+			continue;
 		}
 
 		command[strcspn(command, "\n")] = '\0'; // replace the newline character with a null terminator so that we can compare against hard-coded keywords (e.g. exit)
